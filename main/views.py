@@ -21,7 +21,5 @@ class TakeTestView(View):
         else:
             questions = test.questions.all().order_by('?')
 
-        print(len(questions))
-
         return render(request, 'take_test.html', context={'test': test, 'questions': questions})
     

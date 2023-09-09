@@ -15,7 +15,7 @@ class TestAdmin(admin.ModelAdmin):
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ['question', 'test', 'answers', 'correct_answers']
+    list_display = ['question', 'answers', 'correct_answers']
 
     def answers(self, question):
         return question.answers.count()
@@ -26,7 +26,4 @@ class QuestionAdmin(admin.ModelAdmin):
 
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
-    list_display = ['answer', 'question', 'test']
-
-    def test(self, answer):
-        return answer.question.test
+    list_display = ['answer', 'question']

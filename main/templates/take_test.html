@@ -8,6 +8,9 @@
         right: 10px;
         font-size: 1.5rem;
         font-weight: bold;
+
+        position: sticky;
+        position: -webkit-sticky;
     }
 
     .timer * {
@@ -18,23 +21,12 @@
         font-weight: bold;
     }
 
-    .accordion-item {
+    .correct-answer {
         background-color: var(--dark-background-2);
         padding: 1em;
     }
-    
-    .accordion-header * {
-        color: var(--light-background-1);
-    }
 
-    .accordion-item button:hover,
-    .accordion-item button:focus,
-    .accordion-item button:active
-    {
-        color: var(--light-background-1);
-    }
-
-    .accordion-item li {
+    .correct-answer li {
         list-style: none;
         color: var(--light-background-1);
     }
@@ -49,12 +41,17 @@
         background-color: var(--dark-background-4);
         cursor: pointer;
     }
-</style>
+    </style>
 
 {% endblock styles %}
 
 {% block content %}
+<div class="timer card card-body col-lg-2 offset-lg-10">
+    <div id="score" class="score-text">Score: 0/{{ questions|length }}</div>
+    <div id="timer" class="timer-text">00:00</div>
+</div>
 <div class="container">
+
     <div class="test">
         <h2 class="title">{{ test.title }}</h2>
 
@@ -80,33 +77,16 @@
                 Submit Answer
             </button>
 
-            <div class="accordion accordion-flush mt-3">
-                <div id="{{ question.pk }}" class="accordion-item correct-answer">
-                    <h5 class="accordion-header">
-                        <button 
-                            class="btn" 
-                            data-bs-toggle="collapse" 
-                            data-bs-target="#collapse{{ question.pk }}" 
-                            aria-expanded="true" 
-                            aria-controls="collapse{{ question.pk }}"
-                            >
-                            Show Answer
-                        </button>
-                    </h5>
-
-                    <div id="collapse{{ question.pk }}" class="accordion-collapse collapse">
-                        {% for answer in question.correct_answers.all %}
-                        <li>{{ answer.answer }}</li>
-                        {% endfor %}
-                        
-                        {% if question.explanation %}
-                        <p class="bg-success">
-                            <strong>Explanation: </strong> {{ question.explanation }}
-                        </p>
-                        {% endif %}
-                    </div>
-    
-                </div>
+            <div id="correct-answer-{{ question.pk }}" class="correct-answer d-none">
+                {% for answer in question.correct_answers.all %}
+                <li>{{ answer.answer }}</li>
+                {% endfor %}
+                
+                {% if question.explanation %}
+                <p class="bg-success">
+                    <strong>Explanation: </strong> {{ question.explanation }}
+                </p>
+                {% endif %}
             </div>
 
             <hr>
@@ -114,10 +94,6 @@
         </div>
     </div>
 
-    <div class="timer card card-body">
-        <div id="score" class="score-text">Score: </div>
-        <div id="timer" class="timer-text">00:00</div>
-    </div>
 </div>
 {% endblock content %}
 
@@ -162,6 +138,7 @@
             
             sessionStorage.setItem(question, JSON.stringify(answers));
         } else {
+            elem.style.backgroundColor = "var(--green-1)";
             sessionStorage.setItem(question, JSON.stringify([answer]))
         }
     }
@@ -172,25 +149,46 @@
             document.getElementById(`error-msg-${question}`).innerText = "Please select an answer.";
             return;
         }
-
+        
         const condition = correctAnswers.every(element => answers.includes(element.toString())) && correctAnswers.length === answers.length;
+        const btn = document.getElementById(`question-${question}-selector`);
         if (condition === true) {
-            const btn = document.getElementById(`question-${question}-selector`);
-            btn.disabled = true;
             let score = sessionStorage.getItem('score');
             if (score !== null && score !== undefined) {
                 score = parseInt(score) + 1;
             } else {
                 score = 1;
             }
-            scoreElem.innerText = `Score: ${score}`;
+            scoreElem.innerText = `Score: ${score}/{{ questions|length }}`;
             sessionStorage.setItem('score', score);
             console.log("Correct");
         } else {
-            const correctAnswerElem = document.getElementById(`collapse${question}`);
-            correctAnswerElem.classList.add('show');
+            const correctAnswerElem = document.getElementById(`correct-answer-${question}`);
+            correctAnswerElem.classList.remove('d-none');
             console.log("Not Correct");
         }
+        btn.disabled = true;
+
+        let attempted = sessionStorage.getItem('attempted');
+        if (attempted !== null && attempted !== undefined) {
+            attempted = parseInt(attempted) + 1;
+        } else {
+            attempted = 1;
+        }
+        sessionStorage.setItem('attempted', attempted);
+
+        if (isTestFinished()) {
+            alert("Test has finished.");
+        } else {
+            return;
+        }
+    }
+
+    const isTestFinished = () => {
+        const attempted = parseInt(sessionStorage.getItem('attempted'));
+        const questions_count = parseInt(`{{ questions|length }}`);
+
+        return attempted === questions_count;
     }
 
 </script>
