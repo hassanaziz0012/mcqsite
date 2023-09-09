@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block styles %}
+<style>
+    .timer {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    .questions h5 {
+        font-weight: bold;
+    }
+
+    .accordion-item {
+        background-color: var(--dark-background-2);
+        padding: 1em;
+    }
+    
+    .accordion-header * {
+        color: var(--light-background-1);
+    }
+
+    .accordion-item button:hover,
+    .accordion-item button:focus,
+    .accordion-item button:active
+    {
+        color: var(--light-background-1);
+    }
+
+    .accordion-item li {
+        list-style: none;
+        color: var(--light-background-1);
+    }
+</style>
+
+{% endblock styles %}
+
+{% block content %}
+<div class="container">
+    <div class="test">
+        <h2 class="title">{{ test.title }}</h2>
+
+        <div class="questions">
+            {% for question in test.questions.all %}
+            <h5>{{ question.question }}</h5>
+            {% if question.image %}
+            <img src="{{ question.image.url }}" alt="{{ question.question }} - image" class="img-fluid">
+            {% endif %}
+
+            <ul class="answers-list">
+                {% for answer in question.answers.all %}
+                <li>{{ answer.answer }}</li>
+                {% endfor %}
+            </ul>
+            
+
+            <div class="accordion accordion-flush">
+                <div id="{{ question.pk }}" class="accordion-item correct-answer">
+                    <h5 class="accordion-header">
+                        <button 
+                            class="btn" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#collapse{{ question.pk }}" 
+                            aria-expanded="true" 
+                            aria-controls="collapse{{ question.pk }}"
+                            >
+                            Show Answer
+                        </button>
+                    </h5>
+
+                    <div id="collapse{{ question.pk }}" class="accordion-collapse collapse">
+                        {% for answer in question.correct_answers.all %}
+                        <li>{{ answer.answer }}</li>
+                        {% endfor %}
+                        
+                        {% if question.explanation %}
+                        <p class="bg-success">
+                            <strong>Explanation: </strong> {{ question.explanation }}
+                        </p>
+                        {% endif %}
+        
+                    </div>
+    
+                </div>
+            </div>
+
+            <hr>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="timer" class="timer card card-body">
+        00:00
+    </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    const urlParams = new URLSearchParams(new URL(window.location.href).search);
+    const durationInMinutes = urlParams.get('duration');
+    let duration = durationInMinutes * 60;
+    const timer = document.getElementById('timer');
+
+    const interval = setInterval(() => {
+        duration--;
+        updateTimer();
+
+        if (duration <= 0) {
+            clearInterval(interval);
+            alert("You've run out of time.")
+        }
+    }, 1000); 
+
+    const updateTimer = () => {
+        const mins = Math.floor(duration / 60);
+        const secs = duration % 60;
+        timer.innerText = `${mins}:${secs}`;
+    }
+
+    const showAnswer = () => {
+
+    }
+</script>
+{% endblock scripts %}

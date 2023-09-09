@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container">
+    <div class="tests row mt-3">
+        {% for test in tests %}
+        <div class="card col-lg-6 p-0 text-white">
+            <div class="card-body">
+                <h2 class="card-title">{{ test.title }}</h2>
+                <p class="card-text">
+                    <span>{{ test.questions.count }} Questions</span>
+                </p>
+            </div>
+
+            <div class="card-footer">
+                <p>Take Test</p>
+                <a href="{% url 'take-test' test_id=test.pk %}?duration=30">
+                    <button class="btn btn-primary">30 minute</button>
+                </a>
+                <a href="{% url 'take-test' test_id=test.pk %}?duration=60">
+                    <button class="btn btn-success">60 minute</button>
+                </a>
+            </div>
+        </div>
+
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}
