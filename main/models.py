@@ -15,7 +15,7 @@ class Test(models.Model):
 
 
 class Question(models.Model):
-    question = models.CharField(max_length=250)
+    question = models.CharField(max_length=500)
     extra_information = models.TextField(null=True, blank=True)
     image = models.ImageField(upload_to='question-images', null=True, blank=True)
     answers = models.ManyToManyField('Answer', blank=True, related_name='question_answers')
