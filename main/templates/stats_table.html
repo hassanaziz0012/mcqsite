@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block styles %}
+<style>
+    .stats-table td, th {
+        color: var(--light-background-1) !important;
+    }
+
+    h2.card-title {
+        background-color: transparent !important;
+    }
+</style>
+
+{% endblock styles %}
+
+{% block content %}
+<div class="container">
+    <div class="col-lg-9 card card-body">
+        <h2 class="card-title">{{ test_title }}</h2>
+        <hr>
+
+        <table class="table stats-table">
+            <thead class="thead">
+                <th>Answer</th>
+                <th>Count</th>
+            </thead>
+            
+            <tbody class="table">
+                {% for key, value in counts.items %}
+                <tr>
+                    <td>{{ key }}</td>
+                    <td>{{ value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock content %}

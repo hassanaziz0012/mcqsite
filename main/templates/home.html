@@ -9,6 +9,9 @@
                 <h2 class="card-title">{{ test.title }}</h2>
                 <p class="card-text">
                     <span>{{ test.questions.count }} Questions</span>
+                    <p>
+                        <a href="{% url 'test-stats' test_id=test.pk %}">See Stats Table</a>
+                    </p>
                 </p>
             </div>
 
